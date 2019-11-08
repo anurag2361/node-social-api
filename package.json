@@ -1,0 +1,35 @@
+{
+    "author": "Anurag Sharma",
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "bluebird": "^3.7.1",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.7.7",
+        "morgan": "^1.9.1",
+        "redis": "^2.8.0",
+        "winston": "^3.2.1",
+        "winston-daily-rotate-file": "^4.2.1"
+    },
+    "description": "save user session data from mongo to redis",
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.2",
+        "@types/bluebird": "^3.5.28",
+        "@types/express": "^4.17.2",
+        "@types/jsonwebtoken": "^8.3.5",
+        "@types/mongoose": "^5.5.28",
+        "@types/morgan": "^1.7.37",
+        "@types/redis": "^2.8.14",
+        "@types/winston": "^2.4.4",
+        "tslint": "^5.20.0",
+        "typescript": "^3.6.4"
+    },
+    "license": "ISC",
+    "main": "dist/index.js",
+    "name": "node-redis-mongo-session",
+    "scripts": {
+        "start": "rm -rf dist/ && tsc && NODE_ENV=production PORT=3001 node dist/src/server.js",
+        "dev": "rm -rf dist/ && tsc && NODE_ENV=development PORT=3001 node dist/src/server.js"
+    },
+    "version": "0.1.0"
+}
