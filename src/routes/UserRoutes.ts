@@ -7,6 +7,7 @@ router.get("/hello", (req: Request, res: Response) => {
     res.send("Hello user");
 });
 
+// signup
 router.post("/signup", (req: Request, res: Response) => {
     if (typeof (req.body.name) === `string` && typeof (req.body.phone) === `string` && typeof (req.body.email) === `string` && typeof (req.body.password) === `string`) {
         DAOManager.prototype.signup(req.body.name, req.body.phone, req.body.email, req.body.password, res);
@@ -15,6 +16,7 @@ router.post("/signup", (req: Request, res: Response) => {
     }
 });
 
+// login
 router.post("/login", (req: Request, res: Response) => {
     if (typeof (req.body.email) === `string` && typeof (req.body.password) === `string`) {
         DAOManager.prototype.login(req.body.email, req.body.password, res);
@@ -23,11 +25,13 @@ router.post("/login", (req: Request, res: Response) => {
     }
 });
 
+// open profile
 router.get("/:id/profile", auth, (req: Request, res: Response) => {
     DAOManager.prototype.profile(req.params.id, res);
 });
 
-router.post("/:id/post", auth, (req: Request, res: Response) => {
+// make a post
+router.post("/:id/post", /*auth,*/(req: Request, res: Response) => {
     if (typeof (req.body.post) === `string`) {
         DAOManager.prototype.post(req.params.id, req.body.post, res);
     } else {
@@ -35,12 +39,13 @@ router.post("/:id/post", auth, (req: Request, res: Response) => {
     }
 });
 
+// search profile
 router.get("/:userid/search/:searchid", auth, (req: Request, res: Response) => {
     DAOManager.prototype.search(req.params.userid, req.params.searchid, res);
 });
 
 // like,unlike,comment,report api
-router.get("/:userid/post/:postid", auth, async (req: Request, res: Response, next) => {
+router.get("/:userid/post/:postid", /*auth,*/ async (req: Request, res: Response, next) => {
     DAOManager.prototype.action(req.query.status, req.params.userid, req.params.postid, res);
 });
 
@@ -61,9 +66,15 @@ router.get("/:requesterid/accept/:recipientid/", auth, (req: Request, res: Respo
 
 // timeline
 router.get("/:userid/timeline", auth, (req: Request, res: Response) => {
-    const skip = req.query.skip || 0;
-    const limit = req.query.limit || 10;
-    DAOManager.prototype.timeline(req.params.userid, res, skip, limit);
+    const request: any = req;
+    // console.log(request.decoded);
+    if (request.decoded) {
+        const skip = req.query.skip || 0;
+        const limit = req.query.limit || 10;
+        DAOManager.prototype.timeline(request.decoded._id, res, skip, limit);
+    } else {
+        console.log(request.refresh);
+    }
 });
 
 export const UserRouter = router;

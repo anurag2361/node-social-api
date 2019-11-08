@@ -31,6 +31,14 @@ export class DAOManager {
                         phone: user.phone,
                         email: user.email,
                     }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1h" });
+                    const refreshtoken = jwt.sign({
+                        _id: user._id,
+                        name: user.name,
+                        phone: user.phone,
+                        email: user.email,
+                    }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1d" });
+                    const redisClient = ConnectionManager.prototype.redisConnect();
+                    const setrefreshtoken = redisClient.set(user._id + "refreshtoken", refreshtoken);
 
                     const response: IResponse = { error: false, message: "User Signed Up.", data: user, status: 200, token };
                     res.json(response);
@@ -78,6 +86,14 @@ export class DAOManager {
                     phone: doc.phone,
                     email: doc.email,
                 }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1h" });
+                const refreshtoken = jwt.sign({
+                    _id: doc._id,
+                    name: doc.name,
+                    phone: doc.phone,
+                    email: doc.email,
+                }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1d" });
+                const redisClient = ConnectionManager.prototype.redisConnect();
+                const setrefreshtoken = redisClient.set(doc._id + "refreshtoken", refreshtoken);
 
                 const response: IResponse = { error: false, message: "User Logged In.", data: doc, status: 200, token };
                 res.json(response);
@@ -196,14 +212,16 @@ export class DAOManager {
             let postarray = [];
             const user: any = await Models.User.findById(userid);
             if (user) {
-                const posts = await Models.Post.find({ userid: user._id }).skip(0).limit(10).sort({ updatedAt: -1 });
+                await Models.Post.ensureIndexes({ "userid": 1, "updatedAt": -1, "counts.like": -1 });
+                const posts = await Models.Post.find({ userid: user._id }).skip(skip).limit(limit).sort({ "counts.like": -1, "updatedAt": -1 });
                 for (let i = user.friends.length; i >= 0; i--) {
                     // tslint:disable-next-line: prefer-const
                     let friend: any = await Models.Friends.findById(user.friends[i]);
                     if (friend) {
                         if (friend.status === "friends") {
+                            await Models.Post.ensureIndexes({ "userid": 1, "updatedAt": -1, "counts.like": -1 });
                             // tslint:disable-next-line: prefer-const
-                            let friendposts = await Models.Post.find({ userid: friend.recipient }).skip(skip).limit(limit).sort({ updatedAt: -1 });
+                            let friendposts = await Models.Post.find({ userid: friend.recipient }).skip(skip).limit(limit).sort({ "updatedAt": -1, "counts.like": -1 });
                             // tslint:disable-next-line: prefer-const
                             let post = {
                                 myposts: posts,
