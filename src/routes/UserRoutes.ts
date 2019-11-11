@@ -68,12 +68,14 @@ router.get("/:requesterid/accept/:recipientid/", auth, (req: Request, res: Respo
 router.get("/:userid/timeline", auth, (req: Request, res: Response) => {
     const request: any = req;
     // console.log(request.decoded);
-    if (request.decoded) {
+    if (request.decoded.id) {
+        const skip = req.query.skip || 0;
+        const limit = req.query.limit || 10;
+        DAOManager.prototype.timeline(request.decoded.id, res, skip, limit);
+    } else if (request.decoded._id) {
         const skip = req.query.skip || 0;
         const limit = req.query.limit || 10;
         DAOManager.prototype.timeline(request.decoded._id, res, skip, limit);
-    } else {
-        console.log(request.refresh);
     }
 });
 
