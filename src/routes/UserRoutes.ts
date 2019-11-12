@@ -26,14 +26,24 @@ router.post("/login", (req: Request, res: Response) => {
 });
 
 // open profile
-router.get("/:id/profile", auth, (req: Request, res: Response) => {
-    DAOManager.prototype.profile(req.params.id, res);
+router.get("/:userid/profile", auth, (req: Request, res: Response) => {
+    const request: any = req;
+    if (request.decoded.id) {
+        DAOManager.prototype.profile(request.decoded.id, res);
+    } else if (request.decoded._id) {
+        DAOManager.prototype.profile(request.decoded._id, res);
+    }
 });
 
 // make a post
-router.post("/:id/post", /*auth,*/(req: Request, res: Response) => {
+router.post("/:userid/post", /*auth,*/(req: Request, res: Response) => {
     if (typeof (req.body.post) === `string`) {
-        DAOManager.prototype.post(req.params.id, req.body.post, res);
+        const request: any = req;
+        if (request.decoded.id) {
+            DAOManager.prototype.post(request.decoded.id, req.body.post, res);
+        } else if (request.decoded._id) {
+            DAOManager.prototype.post(request.decoded._id, req.body.post, res);
+        }
     } else {
         return res.send("Parameters requires string");
     }
@@ -45,13 +55,24 @@ router.get("/:userid/search/:searchid", auth, (req: Request, res: Response) => {
 });
 
 // like,unlike,comment,report api
-router.get("/:userid/post/:postid", /*auth,*/ async (req: Request, res: Response, next) => {
-    DAOManager.prototype.action(req.query.status, req.params.userid, req.params.postid, res);
+router.get("/:userid/post/:postid", auth, async (req: Request, res: Response, next) => {
+    const request: any = req;
+    if (request.decoded.id) {
+        DAOManager.prototype.action(req.query.status, request.decoded.id, req.params.postid, res);
+    } else if (request.decoded._id) {
+        DAOManager.prototype.action(req.query.status, request.decoded._id, req.params.postid, res);
+    }
 });
 
 // update profile
 router.post("/:userid/profile/update", auth, async (req: Request, res: Response) => {
-    DAOManager.prototype.update(req.params.userid, req.body, res);
+    const request: any = req;
+    // console.log(request.decoded);
+    if (request.decoded.id) {
+        DAOManager.prototype.update(request.decoded.id, req.body, res);
+    } else if (request.decoded._id) {
+        DAOManager.prototype.update(request.decoded._id, req.body, res);
+    }
 });
 
 // friend request
