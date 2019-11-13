@@ -1,4 +1,5 @@
 import { genSalt, hash } from "bcryptjs";
+import { ObjectID } from "bson";
 import jwt from "jsonwebtoken";
 import { ConnectionManager } from "./../Connections/dbConnections";
 import { updatePostAction } from "./../ImportantFunctions/UpdatePostAction";
@@ -290,7 +291,7 @@ export class DAOManager {
         }
     }
 
-    public async action(status: string, userid: string, postid: string, res) {
+    public async action(status: string, userid: string, postid: string, comment: string, res) {
         switch (status) {
             case "like":
                 try {
@@ -305,7 +306,7 @@ export class DAOManager {
                         } else {
                             post.counts.like++;
                             const savepost = await post.save();
-                            await updatePostAction(postid, userid, status, Models.PostAction).then((saveaction) => {
+                            await updatePostAction(postid, null, userid, status, Models.PostAction).then((saveaction) => {
                                 const response = {
                                     Post: savepost,
                                     PostAction: saveaction,
@@ -356,18 +357,15 @@ export class DAOManager {
                     } else {
                         post.counts.comment++;
                         const savepost = await post.save();
-                        await updatePostAction(postid, userid, status, Models.PostAction).then((saveaction) => {
-                            const response = {
-                                Post: savepost,
-                                PostAction: saveaction,
-                            };
-                            res.send(response);
-                        }).catch((err) => {
-                            throw err;
-                        });
+                        const postactionResult = await updatePostAction(postid, comment, userid, status, Models.PostAction);
+                        const response = {
+                            Post: savepost,
+                            PostAction: postactionResult,
+                        };
+                        return res.status(200).json(response);
                     }
                 } catch (error) {
-                    throw error;
+                    console.log(error);
                 }
                 break;
             ///////////////////////////////////
@@ -384,7 +382,7 @@ export class DAOManager {
                         } else {
                             post.counts.report++;
                             const savepost = await post.save();
-                            await updatePostAction(postid, userid, status, Models.PostAction).then((saveaction) => {
+                            await updatePostAction(postid, null, userid, status, Models.PostAction).then((saveaction) => {
                                 const response = {
                                     Post: savepost,
                                     PostAction: saveaction,
@@ -400,6 +398,35 @@ export class DAOManager {
                 }
                 break;
             default: res.send("Enter an option in querystring to perform operations. E.g. like, unlike, comment");
+        }
+    }
+
+    public async SeePost(postid, res) {
+        try {
+            const Post = await Models.Post.findById(postid);
+            if (Post) {
+                const postresult = await Models.Post.aggregate([
+                    {
+                        $match: {
+                            _id: new ObjectID("5dc50a0d8c0a9b41fa76f8d5"),
+                        },
+                    }, {
+                        $lookup: {
+                            from: "postactions",
+                            localField: "_id",
+                            foreignField: "postId",
+                            as: "actions",
+                        },
+                    },
+                ]);
+                const response: IResponse = { error: false, message: "Post Exists", data: postresult, status: 200, token: null };
+                res.json(response);
+            } else {
+                const response: IResponse = { error: true, message: "Post Doesn't Exists.", data: null, status: 404, token: null };
+                res.json(response);
+            }
+        } catch (error) {
+            throw new Error(error);
         }
     }
 }

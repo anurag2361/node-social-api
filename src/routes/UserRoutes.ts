@@ -56,11 +56,20 @@ router.get("/:userid/search/:searchid", auth, (req: Request, res: Response) => {
 
 // like,unlike,comment,report api
 router.get("/:userid/post/:postid", auth, async (req: Request, res: Response, next) => {
+    const comment = req.body.comment;
     const request: any = req;
     if (request.decoded.id) {
-        DAOManager.prototype.action(req.query.status, request.decoded.id, req.params.postid, res);
+        if (comment) {
+            DAOManager.prototype.action(req.query.status, request.decoded.id, req.params.postid, comment, res);
+        } else {
+            DAOManager.prototype.action(req.query.status, request.decodec.id, req.params.postid, null, res);
+        }
     } else if (request.decoded._id) {
-        DAOManager.prototype.action(req.query.status, request.decoded._id, req.params.postid, res);
+        if (comment) {
+            DAOManager.prototype.action(req.query.status, request.decoded._id, req.params.postid, comment, res);
+        } else {
+            DAOManager.prototype.action(req.query.status, request.decodec._id, req.params.postid, null, res);
+        }
     }
 });
 
@@ -98,6 +107,11 @@ router.get("/:userid/timeline", auth, (req: Request, res: Response) => {
         const limit = req.query.limit || 10;
         DAOManager.prototype.timeline(request.decoded._id, res, skip, limit);
     }
+});
+
+// see post
+router.get("/post/:postid", /*auth*/(req: Request, res: Response) => {
+    DAOManager.prototype.SeePost(req.params.postid, res);
 });
 
 export const UserRouter = router;
