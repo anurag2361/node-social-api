@@ -36,7 +36,7 @@ router.get("/:userid/profile", auth, (req: Request, res: Response) => {
 });
 
 // make a post
-router.post("/:userid/post", /*auth,*/(req: Request, res: Response) => {
+router.post("/:userid/post", auth, (req: Request, res: Response) => {
     if (typeof (req.body.post) === `string`) {
         const request: any = req;
         if (request.decoded.id) {
@@ -110,7 +110,7 @@ router.get("/:userid/timeline", auth, (req: Request, res: Response) => {
 });
 
 // see post
-router.get("/post/:postid", /*auth*/(req: Request, res: Response) => {
+router.get("/post/:postid", auth, (req: Request, res: Response) => {
     DAOManager.prototype.SeePost(req.params.postid, res);
 });
 

@@ -102,17 +102,19 @@ export class DAOManager {
         });
     }
 
-    public profile(id: string, res) {
-        Models.User.findById(id, (err, user) => {
-            if (err) {
-                const response: IResponse = { error: true, message: "User Not Found", data: err, status: 404, token: null };
+    public async profile(id: string, res) {
+        try {
+            const userprofile: any = await Models.User.findById(id).lean();
+            if (userprofile) {
+                const response: IResponse = { error: false, message: "User Found", data: userprofile, status: 200, token: null };
                 res.json(response);
-                throw err;
             } else {
-                const response: IResponse = { error: false, message: "User Found", data: user, status: 200, token: null };
+                const response: IResponse = { error: true, message: "User Not Found", data: null, status: 404, token: null };
                 res.json(response);
             }
-        });
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
     public async fRequest(requesterid, recipientid, res) {
@@ -133,8 +135,8 @@ export class DAOManager {
                     });
                     const request1 = await doc1.save();
                     const request2 = await doc2.save();
-                    const userA = await Models.User.findOneAndUpdate({ _id: requesterid }, { $push: { friends: request1._id } });
-                    const userB = await Models.User.findOneAndUpdate({ _id: recipientid }, { $push: { friends: request2._id } });
+                    const userA: any = await Models.User.findOneAndUpdate({ _id: requesterid }, { $push: { friends: request1._id } }).lean();
+                    const userB: any = await Models.User.findOneAndUpdate({ _id: recipientid }, { $push: { friends: request2._id } }).lean();
                     const resp = {
                         userA,
                         userB,
@@ -162,8 +164,8 @@ export class DAOManager {
         if (requester) {
             if (recipient) {
                 try {
-                    const update1 = await Models.Friends.findOneAndUpdate({ requester: requesterid, recipient: recipientid, status: "pending" }, { status: "friends" }, { new: true });
-                    const update2 = await Models.Friends.findOneAndUpdate({ requester: requesterid, recipient: recipientid, status: "requested" }, { status: "friends" }, { new: true });
+                    const update1: any = await Models.Friends.findOneAndUpdate({ requester: requesterid, recipient: recipientid, status: "pending" }, { status: "friends" }, { new: true }).lean();
+                    const update2: any = await Models.Friends.findOneAndUpdate({ requester: requesterid, recipient: recipientid, status: "requested" }, { status: "friends" }, { new: true }).lean();
                     const resp = {
                         update1,
                         update2,
@@ -408,7 +410,7 @@ export class DAOManager {
                 const postresult = await Models.Post.aggregate([
                     {
                         $match: {
-                            _id: new ObjectID("5dc50a0d8c0a9b41fa76f8d5"),
+                            _id: new ObjectID(postid),
                         },
                     }, {
                         $lookup: {
