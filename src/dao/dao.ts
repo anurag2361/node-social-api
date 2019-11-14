@@ -403,6 +403,7 @@ export class DAOManager {
         }
     }
 
+    // See a specific post
     public async SeePost(postid, res) {
         try {
             const Post = await Models.Post.findById(postid);
@@ -427,6 +428,28 @@ export class DAOManager {
                 const response: IResponse = { error: true, message: "Post Doesn't Exists.", data: null, status: 404, token: null };
                 res.json(response);
             }
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    // User friend list
+    public async getFriends(userid, res) {
+        try {
+            // tslint:disable-next-line: prefer-const
+            let friendarray = [];
+            const friendcoll: any = await Models.User.findById(userid).populate("friends").exec();
+            // tslint:disable-next-line: prefer-for-of
+            for (let i = 0; i < friendcoll.friends.length; i++) {
+                const friends: any = await Models.Friends.findOne({ recipient: friendcoll.friends[i].recipient }).populate("recipient").select("-__v -_id -requester -createdAt -updatedAt").lean().exec();
+                delete friends.recipient.friends;
+                delete friends.recipient.password;
+                delete friends.recipient.createdAt;
+                delete friends.recipient.updatedAt;
+                delete friends.recipient.__v;
+                friendarray.push(friends);
+            }
+            res.send(friendarray);
         } catch (error) {
             throw new Error(error);
         }

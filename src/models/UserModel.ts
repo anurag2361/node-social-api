@@ -15,7 +15,7 @@ const userschema = new Schema({
     phone: { type: Number, required: true, unique: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
-    friends: [{ type: Types.ObjectId, ref: "Friends" }],
+    friends: [{ type: Types.ObjectId, ref: "Friend" }],
 }, {
     timestamps: true,
 });

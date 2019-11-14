@@ -110,8 +110,18 @@ router.get("/:userid/timeline", auth, (req: Request, res: Response) => {
 });
 
 // see post
-router.get("/post/:postid", auth, (req: Request, res: Response) => {
+router.get("/post/:postid", (req: Request, res: Response) => {
     DAOManager.prototype.SeePost(req.params.postid, res);
+});
+
+// see user friend's list
+router.get("/:userid/getfriends", auth, (req: Request, res: Response) => {
+    const request: any = req;
+    if (request.decoded.id) {
+        DAOManager.prototype.getFriends(request.decoded.id, res);
+    } else if (request.decoded._id) {
+        DAOManager.prototype.getFriends(request.decoded._id, res);
+    }
 });
 
 export const UserRouter = router;
