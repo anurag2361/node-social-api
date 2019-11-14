@@ -31,13 +31,13 @@ export class DAOManager {
                         name: user.name,
                         phone: user.phone,
                         email: user.email,
-                    }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1h" });
+                    }, process.env.TOKEN_SECRET, { expiresIn: "1h" });
                     const refreshtoken = jwt.sign({
                         _id: user._id,
                         name: user.name,
                         phone: user.phone,
                         email: user.email,
-                    }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1d" });
+                    }, process.env.TOKEN_SECRET, { expiresIn: "1d" });
                     const redisClient = ConnectionManager.prototype.redisConnect();
                     const setrefreshtoken = redisClient.set(user._id + "refreshtoken", refreshtoken);
 
@@ -86,13 +86,13 @@ export class DAOManager {
                     name: doc.name,
                     phone: doc.phone,
                     email: doc.email,
-                }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1h" });
+                }, process.env.TOKEN_SECRET, { expiresIn: "1h" });
                 const refreshtoken = jwt.sign({
                     _id: doc._id,
                     name: doc.name,
                     phone: doc.phone,
                     email: doc.email,
-                }, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", { expiresIn: "1d" });
+                }, process.env.TOKEN_SECRET, { expiresIn: "1d" });
                 const redisClient = ConnectionManager.prototype.redisConnect();
                 const setrefreshtoken = redisClient.set(doc._id + "refreshtoken", refreshtoken);
 

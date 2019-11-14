@@ -8,7 +8,7 @@ mongoose.set("useUnifiedTopology", true);
 export class ConnectionManager {
     constructor() { }
     public async dbConnect() {
-        await mongoose.connect("mongodb://localhost:27017/chatdb", { useNewUrlParser: true, autoIndex: false, autoReconnect: true }, (err: any) => {
+        await mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, autoIndex: false, autoReconnect: true }, (err: any) => {
             if (err) {
                 throw new Error(err);
             } else {

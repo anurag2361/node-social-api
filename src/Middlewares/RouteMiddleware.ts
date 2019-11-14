@@ -7,7 +7,7 @@ import { IResponse } from "./../Interfaces/Response";
 export const auth = (req, res, next) => {
     const token = req.body.token || req.query.token || req.headers["x-access-token"] || req.headers.authorization;
     if (token) {
-        jwt.verify(token, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", null, (err, decoded) => {
+        jwt.verify(token, process.env.TOKEN_SECRET, null, (err, decoded) => {
             // console.log(decoded);
             if (err) {
                 if (err.name === "TokenExpiredError") {
@@ -18,7 +18,7 @@ export const auth = (req, res, next) => {
                             throw (err1);
                         } else {
                             // console.log(reply);
-                            const refresh = jwt.verify(reply, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe", null);
+                            const refresh = jwt.verify(reply, process.env.TOKEN_SECRET, null);
                             // console.log(refresh);
                             req.decoded = refresh;
                             next();

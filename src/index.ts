@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
 import logger from "./config/winston";
@@ -5,6 +6,8 @@ import { ConnectionManager } from "./Connections/dbConnections";
 import * as router from "./RoutesList";
 export const app = express();
 app.set("port", process.env.PORT || 3001);
+
+dotenv.config();
 
 // Connecting all required DBs from an external class
 (async function dbConnect() {
