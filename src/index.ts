@@ -5,7 +5,7 @@ import logger from "./config/winston";
 import { ConnectionManager } from "./Connections/dbConnections";
 import * as router from "./RoutesList";
 export const app = express();
-app.set("port", process.env.PORT || 3001);
+app.set("port", process.env.PORT);
 
 dotenv.config();
 

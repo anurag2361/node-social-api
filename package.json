@@ -23,6 +23,7 @@
         "@types/morgan": "^1.7.37",
         "@types/redis": "^2.8.14",
         "@types/winston": "^2.4.4",
+        "concurrently": "^5.0.0",
         "tslint": "^5.20.1",
         "typescript": "^3.7.2"
     },
@@ -31,7 +32,11 @@
     "name": "node-redis-mongo-session",
     "scripts": {
         "start": "rm -rf dist/ && tsc && NODE_ENV=production PORT=3001 node dist/src/server.js",
-        "dev": "rm -rf dist/ && tsc && NODE_ENV=development PORT=3001 node dist/src/server.js"
+        "dev": "rm -rf dist/ && tsc && NODE_ENV=development PORT=3001 node dist/src/server.js",
+        "client": "cd front && npm start",
+        "server": "rm -rf dist/ && tsc && NODE_ENV=production node dist/src/index.js",
+        "dev": "concurrently \"npm run server\" \"npm run client\"",
+        "start": "rm -rf dist/ && tsc && NODE_ENV=production node dist/src/index.js"
     },
     "version": "0.1.0"
 }

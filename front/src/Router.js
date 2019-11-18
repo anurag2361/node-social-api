@@ -1,0 +1,20 @@
+import React, { Component } from 'react';
+import { Switch, Route } from 'react-router-dom';
+import Signup from './components/Signup/Signup';
+import Profile from "./components/Profile/profile";
+import Login from "./components/Login/Login";
+
+class Router extends Component {
+    render() {
+        return (
+            <div>
+                <Switch>
+                    <Route exact path='/' component={Signup} />
+                    <Route exact path="/login" component={Login} />
+                    <Route exact path="/:userid/profile" component={Profile} />
+                </Switch>
+            </div>
+        )
+    }
+}
+export default Router;
