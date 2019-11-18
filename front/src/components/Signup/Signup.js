@@ -29,7 +29,7 @@ class Signup extends Component {
     handleSubmit(event) {
         event.preventDefault();
         const { name, phone, email, password } = this.state;
-        axios.post("user/signup", {
+        axios.post("/user/signup", {
             name: this.state.name,
             phone: this.state.phone,
             email: this.state.email,

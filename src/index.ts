@@ -1,3 +1,4 @@
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
@@ -5,8 +6,6 @@ import logger from "./config/winston";
 import { ConnectionManager } from "./Connections/dbConnections";
 import * as router from "./RoutesList";
 export const app = express();
-app.set("port", process.env.PORT);
-
 dotenv.config();
 
 // Connecting all required DBs from an external class
@@ -15,11 +14,15 @@ dotenv.config();
     await ConnectionManager.prototype.redisConnect();
 })();
 
+app.set("port", process.env.PORT);
+app.use(cors());
+
 // using express body-parser for form data
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/user", router.UserRouter);
+
 class MyStream {
     private write(message: string) {
         logger.info(message);
