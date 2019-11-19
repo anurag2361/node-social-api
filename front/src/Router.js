@@ -3,6 +3,7 @@ import { Switch, Route } from 'react-router-dom';
 import Signup from './components/Signup/Signup';
 import Profile from "./components/Profile/profile";
 import Login from "./components/Login/Login";
+import Post from "./components/Post/Post";
 
 class Router extends Component {
     render() {
@@ -12,6 +13,7 @@ class Router extends Component {
                     <Route exact path='/' component={Signup} />
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/:userid/profile" component={Profile} />
+                    <Route exact path="/:userid/post" component={Post} />
                 </Switch>
             </div>
         )

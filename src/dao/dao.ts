@@ -98,6 +98,7 @@ export class DAOManager {
 
                 const response: IResponse = { error: false, message: "User Logged In.", data: doc, status: 200, token };
                 res.json(response);
+                console.log(response);
             }
         });
     }
@@ -187,6 +188,60 @@ export class DAOManager {
         }
     }
 
+    public async getPosts(id, res) {
+        try {
+            const user = await Models.User.findById(id);
+            if (user) {
+                const posts = await Models.User.aggregate([
+                    {
+                        $match: {
+                            _id: new ObjectID(id),
+                        },
+                    }, {
+                        $lookup: {
+                            from: "posts",
+                            localField: "_id",
+                            foreignField: "userid",
+                            as: "posts",
+                        },
+                    },
+                ]);
+                const response: IResponse = { error: false, message: "Posts", data: posts, status: 200, token: null };
+                res.json(response);
+            } else {
+                const response: IResponse = { error: true, message: "User Not Found", data: null, status: 404, token: null };
+                res.json(response);
+            }
+        } catch (error) {
+            const response: IResponse = { error: true, message: "Some error occured", data: error, status: 500, token: null };
+            res.json(response);
+            throw new Error(error);
+        }
+    }
+
+    public async logout(id, res) {
+        try {
+            const user = await Models.User.findById(id);
+            if (user) {
+                const redisClient = ConnectionManager.prototype.redisConnect();
+                redisClient.del(id + "refreshtoken", (err, reply) => {
+                    if (reply === 1) {
+                        res.send("deleted");
+                    } else {
+                        res.send("Couldnt delete");
+                    }
+                });
+            } else {
+                const response: IResponse = { error: true, message: "User Not Found", data: null, status: 404, token: null };
+                res.json(response);
+            }
+        } catch (error) {
+            const response: IResponse = { error: true, message: "Some error occured", data: error, status: 500, token: null };
+            res.json(response);
+            throw new Error(error);
+        }
+    }
+
     public post(id: string, post: string, res) {
         Models.User.findById(id, (err, user) => {
             if (err) {
@@ -201,9 +256,11 @@ export class DAOManager {
                 newpost.save().then((userpost) => {
                     const response: IResponse = { error: false, message: "Post created", data: userpost, status: 200, token: null };
                     res.json(response);
+                    console.log(response);
                 }).catch((error) => {
                     const response: IResponse = { error: true, message: "Some error occured", data: error, status: 500, token: null };
                     res.json(response);
+                    console.log(response);
                 });
             }
         });

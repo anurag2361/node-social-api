@@ -1,4 +1,4 @@
-import { Document, Model, model, Schema } from "mongoose";
+import { Document, Model, model, Schema, Types } from "mongoose";
 
 export interface IPost extends Document {
     userid: string;
@@ -15,7 +15,7 @@ export interface IPost extends Document {
 }
 
 const postschema = new Schema({
-    userid: { type: String, required: true },
+    userid: { type: Types.ObjectId, required: true, ref: "User" },
     post: { type: String, required: true },
     counts: {
         comment: { default: 0, min: 0, type: Number },

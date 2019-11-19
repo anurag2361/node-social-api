@@ -6,6 +6,7 @@ import { IResponse } from "./../Interfaces/Response";
 // pass access and refresh token
 export const auth = (req, res, next) => {
     const token = req.body.token || req.query.token || req.headers["x-access-token"] || req.headers.authorization;
+    console.log(token);
     if (token) {
         jwt.verify(token, process.env.TOKEN_SECRET, null, (err, decoded) => {
             // console.log(decoded);

@@ -49,6 +49,26 @@ router.post("/:userid/post", auth, (req: Request, res: Response) => {
     }
 });
 
+// get all posts
+router.get("/:userid/posts", auth, (req: Request, res: Response) => {
+    const request: any = req;
+    if (request.decoded.id) {
+        DAOManager.prototype.getPosts(request.decoded.id, res);
+    } else if (request.decoded._id) {
+        DAOManager.prototype.getPosts(request.decoded._id, res);
+    }
+});
+
+// log out
+router.get("/:userid/logout", auth, (req: Request, res: Response) => {
+    const request: any = req;
+    if (request.decoded.id) {
+        DAOManager.prototype.logout(request.decoded.id, res);
+    } else if (request.decoded._id) {
+        DAOManager.prototype.logout(request.decoded._id, res);
+    }
+});
+
 // search profile
 router.get("/:userid/search/:searchid", auth, (req: Request, res: Response) => {
     DAOManager.prototype.search(req.params.userid, req.params.searchid, res);

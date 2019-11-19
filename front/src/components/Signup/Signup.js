@@ -37,6 +37,7 @@ class Signup extends Component {
         }).then((data) => {
             this.setState({ response: data });
             this.props.history.push({ pathname: `${data.data.data._id}/profile`, payload: data });
+            localStorage.setItem("token", data.data.token);
         }).catch((error) => {
             console.log(error);
         });

@@ -19,18 +19,15 @@ class Login extends Component {
         this.setState(state);
     }
 
-    componentDidMount() {
-        console.log(this.props.history);
-    }
-
     handleSubmit(event) {
         event.preventDefault();
         const { email, password } = this.state;
-        axios.post("/user/signup", {
+        axios.post("/user/login", {
             email: this.state.email,
             password: this.state.password
         }).then((data) => {
-            this.setState({ response: data });
+            console.log(data);
+            localStorage.setItem("token", data.data.token);
             this.props.history.push({ pathname: `${data.data.data._id}/profile`, payload: data });
         }).catch((error) => {
             console.log(error);
