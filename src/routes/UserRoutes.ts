@@ -61,6 +61,7 @@ router.get("/:userid/posts", auth, (req: Request, res: Response) => {
 
 // log out
 router.get("/:userid/logout", auth, (req: Request, res: Response) => {
+    console.log("here");
     const request: any = req;
     if (request.decoded.id) {
         DAOManager.prototype.logout(request.decoded.id, res);
@@ -75,20 +76,22 @@ router.get("/:userid/search/:searchid", auth, (req: Request, res: Response) => {
 });
 
 // like,unlike,comment,report api
-router.get("/:userid/post/:postid", auth, async (req: Request, res: Response, next) => {
+router.post("/:userid/post/:postid", auth, async (req: Request, res: Response, next) => {
     const comment = req.body.comment;
+    console.log(comment);
     const request: any = req;
+    console.log(request.query, req.body);
     if (request.decoded.id) {
         if (comment) {
-            DAOManager.prototype.action(req.query.status, request.decoded.id, req.params.postid, comment, res);
+            DAOManager.prototype.action(req.body.params.status, request.decoded.id, req.params.postid, comment, res);
         } else {
-            DAOManager.prototype.action(req.query.status, request.decodec.id, req.params.postid, null, res);
+            DAOManager.prototype.action(req.body.params.status, request.decoded.id, req.params.postid, null, res);
         }
     } else if (request.decoded._id) {
         if (comment) {
-            DAOManager.prototype.action(req.query.status, request.decoded._id, req.params.postid, comment, res);
+            DAOManager.prototype.action(req.body.params.status, request.decoded._id, req.params.postid, comment, res);
         } else {
-            DAOManager.prototype.action(req.query.status, request.decodec._id, req.params.postid, null, res);
+            DAOManager.prototype.action(req.body.params.status, request.decoded._id, req.params.postid, null, res);
         }
     }
 });
@@ -141,6 +144,16 @@ router.get("/:userid/getfriends", auth, (req: Request, res: Response) => {
         DAOManager.prototype.getFriends(request.decoded.id, res);
     } else if (request.decoded._id) {
         DAOManager.prototype.getFriends(request.decoded._id, res);
+    }
+});
+
+// get comments
+router.get("/:userid/post/:postid/getcomments", auth, (req: Request, res: Response) => {
+    const request: any = req;
+    if (request.decoded.id) {
+        DAOManager.prototype.getcomments(request.decoded.id, req.params.postid, res);
+    } else if (request.decoded._id) {
+        DAOManager.prototype.getcomments(request.decoded._id, req.params.postid, res);
     }
 });
 

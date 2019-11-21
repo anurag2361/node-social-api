@@ -7,18 +7,22 @@ class Header extends Component {
         this.logout = this.logout.bind(this);
     }
 
-    logout() {
-        const token = localStorage.getItem("token");
+    async deleteredistoken() {
         const a = window.location.href.split("/");
         console.log(a);
+        const token = localStorage.getItem("token");
         const headers = {
             "Authorization": token
         }
-        axios.get("/" + a[3] + "/logout", { headers }).then((data) => {
+        await axios.get("/user/" + a[3] + "/logout", { headers }).then((data) => {
             console.log(data);
         }).catch((error) => {
             console.error(error);
         });
+    }
+
+    async logout() {
+        await this.deleteredistoken();
         localStorage.removeItem("token");
         window.location = "/";
     }

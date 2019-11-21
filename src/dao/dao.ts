@@ -196,13 +196,29 @@ export class DAOManager {
                     {
                         $match: {
                             _id: new ObjectID(id),
-                        },
+                        }
                     }, {
                         $lookup: {
                             from: "posts",
-                            localField: "_id",
-                            foreignField: "userid",
                             as: "posts",
+                            let: {
+                                userid: "$_id",
+                            },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $eq: [
+                                                "$$userid", "$userid",
+                                            ],
+                                        },
+                                    },
+                                }, {
+                                    $sort: {
+                                        createdAt: -1,
+                                    },
+                                },
+                            ],
                         },
                     },
                 ]);
@@ -511,4 +527,56 @@ export class DAOManager {
             throw new Error(error);
         }
     }
+
+    public async getcomments(userid, postid, res) {
+        try {
+            const user = await Models.User.findById(userid);
+            if (user) {
+                const post = await Models.Post.findById(postid);
+                if (post) {
+                    const actions = await Models.Post.aggregate([
+                        {
+                            $match: {
+                                _id: new ObjectID(postid),
+                            },
+                        }, {
+                            $lookup: {
+                                from: "postactions",
+                                as: "comments",
+                                let: {
+                                    postid: "$_id",
+                                },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $eq: [
+                                                    "$$postid", "$postId",
+                                                ],
+                                            },
+                                        },
+                                    }, {
+                                        $sort: {
+                                            createdAt: -1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ]);
+                    const response: IResponse = { error: false, message: "All Comments", data: actions, status: 200, token: null };
+                    res.json(response);
+                } else {
+                    const response: IResponse = { error: true, message: "Post Doesn't Exists.", data: null, status: 404, token: null };
+                    res.json(response);
+                }
+            } else {
+                const response: IResponse = { error: true, message: "User Doesn't Exists.", data: null, status: 404, token: null };
+                res.json(response);
+            }
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
 }

@@ -45,6 +45,7 @@ class Post extends Component {
             .then((data) => {
                 console.log(data);
                 this.setState({ post: "" });
+                window.location.reload();
             }).catch((error) => {
                 console.error(error);
             });
