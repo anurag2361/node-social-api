@@ -41,7 +41,6 @@ class Comment extends Component {
     }
 
     render() {
-        const { comment } = this.state;
         return (
             <div>
                 <form onSubmit={this.handleSubmit} style={{ marginTop: "10px" }}>

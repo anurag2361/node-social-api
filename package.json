@@ -35,6 +35,7 @@
     "scripts": {
         "start": "rm -rf dist/ && tsc && NODE_ENV=production node dist/src/server.js",
         "dev": "concurrently \"npm run server\" \"npm run client\"",
+        "servers": "concurrently \"./startmongo.sh\" \"./startredis.sh\"",
         "client": "cd front && npm start",
         "server": "rm -rf dist/ && tsc && NODE_ENV=production node dist/src/server.js"
     },

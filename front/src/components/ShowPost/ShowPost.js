@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import PostView from "./../PostView/PostView";
 import axios from "axios";
 
 class ShowPost extends Component {
@@ -38,13 +37,13 @@ class ShowPost extends Component {
         return (
             <div className="container">
                 <div className="row">
-                    {this.state.posts.map((posts, index) => {
+                    {this.state.posts.map((posts) => {
                         return (
-                            <div className="col-sm-4" style={{ marginBottom: "20px" }}>
-                                <div className="card text-center" style={{ width: "18rem" }}>
-                                    <div className="card-body">
-                                        <p key={index} class="card-text">{posts.post}</p>
-                                        <button type="button" className="btn btn-primary" onClick={() => this.ShowPostView(posts._id)}>View Post</button>
+                            <div key={posts._id + 2} className="col-sm-4" style={{ marginBottom: "20px" }}>
+                                <div key={posts._id + 3} className="card text-center" style={{ width: "18rem" }}>
+                                    <div key={posts._id + 4} className="card-body">
+                                        <p key={posts._id} className="card-text">{posts.post}</p>
+                                        <button key={posts._id + 1} type="button" className="btn btn-primary" onClick={() => this.ShowPostView(posts._id)}>View Post</button>
                                     </div>
                                 </div>
                             </div>

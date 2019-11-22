@@ -28,9 +28,6 @@ class PostView extends Component {
 
     incrementLike(likes) {
         this.setState({ likes: likes + 1 });
-        const headers = {
-            "Authorization": localStorage.getItem("token")
-        }
         axios.post("/user/" + this.state.userid + "/post/" + this.state.postid, {
             token: localStorage.getItem("token"),
             params: {
@@ -55,9 +52,6 @@ class PostView extends Component {
     }
 
     componentWillMount() {
-        const headers = {
-            "Authorization": localStorage.getItem("token")
-        }
         const a = window.location.href.split("/");
         const postid = a[5];
         const userid = a[3];
@@ -84,11 +78,11 @@ class PostView extends Component {
                     <div className="container">
                         <h1 className="display-4">{this.state.posttext}</h1>
                         <p className="lead">Modified At: {this.state.updatedAt}</p>
-                        <button type="button" class="btn btn-primary" onClick={() => this.incrementLike(this.state.likes)}>
-                            Likes <span class="badge badge-light">{this.state.likes}</span>
+                        <button type="button" className="btn btn-primary" onClick={() => this.incrementLike(this.state.likes)}>
+                            Likes <span className="badge badge-light">{this.state.likes}</span>
                         </button>
-                        <button onClick={() => this.showComment()} type="button" class="btn btn-primary" style={{ marginLeft: "50px" }}>
-                            Comments <span class="badge badge-light">{this.state.comments}</span>
+                        <button onClick={() => this.showComment()} type="button" className="btn btn-primary" style={{ marginLeft: "50px" }}>
+                            Comments <span className="badge badge-light">{this.state.comments}</span>
                         </button>
                         {this.state.showCommentBox ? <Comment userid={this.state.userid} postid={this.state.postid}></Comment> : null}
                     </div>

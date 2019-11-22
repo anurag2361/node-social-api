@@ -21,21 +21,34 @@ class Login extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        const { email, password } = this.state;
         axios.post("/user/login", {
             email: this.state.email,
             password: this.state.password
-        }).then((data) => {
+        }).then(async (data) => {
             console.log(data);
-            localStorage.setItem("token", data.data.token);
-            this.props.history.push({ pathname: `${data.data.data._id}/profile`, payload: data });
+            try {
+                const tokenfunc = await this.setToken(data);
+                if (tokenfunc === "token saved") {
+                    this.props.history.push({ pathname: `${data.data.data._id}/profile`, payload: data });
+                } else {
+                    console.log("Can't log you in right now");
+                }
+            } catch (error) {
+                throw new Error(error);
+            }
         }).catch((error) => {
             console.log(error);
         });
     }
 
+    setToken(data) {
+        return new Promise((resolve, reject) => {
+            localStorage.setItem("token", data.data.token);
+            resolve("token saved")
+        });
+    }
+
     render() {
-        const { name, phone, email, password } = this.state;
         return (
             <div>
                 <form onSubmit={this.handleSubmit}>

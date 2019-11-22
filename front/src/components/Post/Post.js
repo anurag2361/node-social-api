@@ -38,7 +38,6 @@ class Post extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        const { post } = this.state;
         const a = window.location.href.split("/");
         console.log(localStorage.getItem("token"));
         axios.post("/user/" + a[3] + "/post", { token: localStorage.getItem("token"), post: this.state.post })
@@ -52,7 +51,6 @@ class Post extends Component {
     }
 
     render() {
-        const { post } = this.state;
         return (
             <div>
                 <Header></Header>

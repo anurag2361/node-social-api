@@ -28,23 +28,37 @@ class Signup extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        const { name, phone, email, password } = this.state;
         axios.post("/user/signup", {
             name: this.state.name,
             phone: this.state.phone,
             email: this.state.email,
             password: this.state.password
-        }).then((data) => {
+        }).then(async (data) => {
             this.setState({ response: data });
-            this.props.history.push({ pathname: `${data.data.data._id}/profile`, payload: data });
-            localStorage.setItem("token", data.data.token);
+            console.log(data.data);
+            try {
+                const tokenfunc = await this.setToken(data);;
+                if (tokenfunc === "token saved") {
+                    this.props.history.push({ pathname: `${data.data.data._id}/profile`, payload: data });
+                } else {
+                    console.log("Can't sign you up right now");
+                }
+            } catch (error) {
+                throw new Error(error);
+            }
         }).catch((error) => {
             console.log(error);
         });
     }
 
+    setToken(data) {
+        return new Promise((resolve, reject) => {
+            localStorage.setItem("token", data.data.token);
+            resolve("token saved")
+        });
+    }
+
     render() {
-        const { name, phone, email, password } = this.state;
         return (
             <div>
                 <form onSubmit={this.handleSubmit}>
