@@ -71,8 +71,8 @@ router.get("/:userid/logout", auth, (req: Request, res: Response) => {
 });
 
 // search profile
-router.get("/:userid/search/:searchid", auth, (req: Request, res: Response) => {
-    DAOManager.prototype.search(req.params.userid, req.params.searchid, res);
+router.post("/:userid/search/", auth, (req: Request, res: Response) => {
+    DAOManager.prototype.search(req.params.userid, req.body.searchid, res);
 });
 
 // like,unlike,comment,report api

@@ -1,3 +1,4 @@
+import { Client } from "@elastic/elasticsearch";
 import mongoose from "mongoose";
 import redis from "redis";
 
@@ -32,6 +33,11 @@ export class ConnectionManager {
         client.on("error", (err) => {
             console.error("Redis Error: " + err);
         });
+        return client;
+    }
+
+    public elasticClient(): Client {
+        const client = new Client({ node: "http://localhost:9200" });
         return client;
     }
 }

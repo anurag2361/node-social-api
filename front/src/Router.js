@@ -5,6 +5,7 @@ import Profile from "./components/Profile/profile";
 import Login from "./components/Login/Login";
 import Post from "./components/Post/Post";
 import PostView from "./components/PostView/PostView"
+import SearchResult from './components/SearchResult/SearchResult';
 
 class Router extends Component {
     render() {
@@ -16,6 +17,7 @@ class Router extends Component {
                     <Route exact path="/:userid/profile" component={Profile} />
                     <Route exact path="/:userid/post" component={Post} />
                     <Route exact path="/:userid/post/:postid" component={PostView} />
+                    <Route exact path="/:userid/search/result" component={SearchResult} />
                 </Switch>
             </div>
         )

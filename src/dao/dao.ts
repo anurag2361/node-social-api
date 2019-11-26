@@ -1,3 +1,4 @@
+import { ApiResponse, RequestParams } from "@elastic/elasticsearch";
 import { genSalt, hash } from "bcryptjs";
 import { ObjectID } from "bson";
 import jwt from "jsonwebtoken";
@@ -5,6 +6,23 @@ import { ConnectionManager } from "./../Connections/dbConnections";
 import { updatePostAction } from "./../ImportantFunctions/UpdatePostAction";
 import { IResponse } from "./../Interfaces/Response";
 import * as Models from "./../ModelsList";
+
+interface ISearchBody {
+    index: string;
+    body: {
+        query: {
+            bool: {
+                must: [
+                    {
+                        match: {
+                            "profile._id": string,
+                        },
+                    },
+                ],
+            },
+        },
+    };
+}
 
 export class DAOManager {
     constructor() { }
@@ -40,7 +58,14 @@ export class DAOManager {
                     }, process.env.TOKEN_SECRET, { expiresIn: "1d" });
                     const redisClient = ConnectionManager.prototype.redisConnect();
                     const setrefreshtoken = redisClient.set(user._id + "refreshtoken", refreshtoken);
-
+                    const elasticClient = ConnectionManager.prototype.elasticClient();
+                    const saveuserelastic = await elasticClient.index({
+                        index: "user",
+                        body: {
+                            profile: user,
+                        },
+                    });
+                    console.log(saveuserelastic);
                     const response: IResponse = { error: false, message: "User Signed Up.", data: user, status: 200, token };
                     res.json(response);
 
@@ -333,28 +358,51 @@ export class DAOManager {
         try {
             const finduser = await Models.User.findById(userid);
             if (finduser) {
-                const redisClient = ConnectionManager.prototype.redisConnect();
-                redisClient.hget(userid, searchid, async (error, reply) => {
-                    if (error) {
-                        const response: IResponse = { error: true, message: "An error occurred", data: error, status: 500, token: null };
-                        res.json(response);
-                    } else if (reply) {
-                        const response: IResponse = { error: false, message: "Profile found from Redis", data: reply, status: 200, token: null };
-                        res.json(response);
-                    } else {
-                        const profile = await Models.User.findById(searchid);
-                        if (profile) {
-                            const response: IResponse = { error: false, message: "Profile found from MongoDB", data: profile, status: 200, token: null };
+                const elasticClient = ConnectionManager.prototype.elasticClient();
+                const userindex: RequestParams.Search = {
+                    index: "user",
+                    body: {
+                        query: {
+                            bool: {
+                                must: [
+                                    {
+                                        match: {
+                                            "profile.name": searchid,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                };
+                const userresult: ApiResponse = await elasticClient.search(userindex);
+                if (userresult) {
+                    const response: IResponse = { error: false, message: "Profile found from Elastic", data: userresult, status: 200, token: null };
+                    res.json(response);
+                } else {
+                    const redisClient = ConnectionManager.prototype.redisConnect();
+                    redisClient.hget(userid, searchid, async (error, reply) => {
+                        if (error) {
+                            const response: IResponse = { error: true, message: "An error occurred", data: error, status: 500, token: null };
                             res.json(response);
-                            const setprofile = redisClient.hset(userid, searchid, JSON.stringify(profile));
-                            const setTTL = redisClient.expire(userid, 604800);
-                            console.log("Profile set in redis", setprofile + " with TTL 1 week: ", setTTL);
+                        } else if (reply) {
+                            const response: IResponse = { error: false, message: "Profile found from Redis", data: reply, status: 200, token: null };
+                            res.json(response);
                         } else {
-                            const response: IResponse = { error: true, message: "Profile doesn't exist", data: null, status: 500, token: null };
-                            res.json(response);
+                            const profile = await Models.User.findById(searchid);
+                            if (profile) {
+                                const response: IResponse = { error: false, message: "Profile found from MongoDB", data: profile, status: 200, token: null };
+                                res.json(response);
+                                const setprofile = redisClient.hset(userid, searchid, JSON.stringify(profile));
+                                const setTTL = redisClient.expire(userid, 604800);
+                                console.log("Profile set in redis", setprofile + " with TTL 1 week: ", setTTL);
+                            } else {
+                                const response: IResponse = { error: true, message: "Profile doesn't exist", data: null, status: 500, token: null };
+                                res.json(response);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             } else {
                 const response: IResponse = { error: true, message: "User not found", data: null, status: 404, token: null };
                 res.json(response);

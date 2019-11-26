@@ -5,6 +5,7 @@ import { IResponse } from "./../Interfaces/Response";
 
 // pass access and refresh token
 export const auth = (req, res, next) => {
+    console.log(req.body);
     const token = req.body.token || req.query.token || req.headers["x-access-token"] || req.headers.authorization;
     console.log("token    ", token);
     if (token) {

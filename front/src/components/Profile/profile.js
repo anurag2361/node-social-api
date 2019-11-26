@@ -22,38 +22,45 @@ class Profile extends Component {
         this.props.history.push("/" + a[3] + "/post");
     }
 
-    componentWillMount() {
+    componentDidMount() {
+        this._isMounted = true;
         const a = window.location.href.split("/");
         const token = localStorage.getItem("token");
-        if (token) {
-            const jwtobject = jwt.verify(token, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe");
-            if (jwtobject.id === a[3]) {
-                const headers = {
-                    "Authorization": localStorage.getItem("token")
-                }
-                axios.get(`/user/${a[3]}/profile`, { headers })
-                    .then((data) => {
-                        console.log(data);
-                        this.setState({
-                            name: data.data.data.name,
-                            email: data.data.data.email,
-                            phone: data.data.data.phone
+        if (this._isMounted) {
+            if (token) {
+                const jwtobject = jwt.verify(token, "98ix0b84gs3r@&$#*np9bgkpfjeib1f9ipe");
+                if (jwtobject.id === a[3]) {
+                    const headers = {
+                        "Authorization": localStorage.getItem("token")
+                    }
+                    axios.get(`/user/${a[3]}/profile`, { headers })
+                        .then((data) => {
+                            console.log(data);
+                            this.setState({
+                                name: data.data.data.name,
+                                email: data.data.data.email,
+                                phone: data.data.data.phone
+                            });
+                        }).catch((error) => {
+                            console.log(error);
                         });
-                    }).catch((error) => {
-                        console.log(error);
-                    });
+                } else {
+                    window.location = "/";
+                }
             } else {
                 window.location = "/";
             }
-        } else {
-            window.location = "/";
         }
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     render() {
         return (
             <div>
-                <Header></Header>
+                <Header props={this.props}></Header>
                 <div className="jumbotron">
                     <h1 className="display-4">Hello, {this.state.name}!</h1>
                     <hr className="my-4" />
