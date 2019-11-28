@@ -6,6 +6,7 @@ import Login from "./components/Login/Login";
 import Post from "./components/Post/Post";
 import PostView from "./components/PostView/PostView"
 import SearchResult from './components/SearchResult/SearchResult';
+import GetFriends from './components/GetFriends/GetFriends';
 
 class Router extends Component {
     render() {
@@ -18,6 +19,7 @@ class Router extends Component {
                     <Route exact path="/:userid/post" component={Post} />
                     <Route exact path="/:userid/post/:postid" component={PostView} />
                     <Route exact path="/:userid/search/result" component={SearchResult} />
+                    <Route exact path="/:userid/getfriends" component={GetFriends} />
                 </Switch>
             </div>
         )

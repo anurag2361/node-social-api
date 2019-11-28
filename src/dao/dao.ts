@@ -130,7 +130,7 @@ export class DAOManager {
 
     public async profile(id: string, res) {
         try {
-            const userprofile: any = await Models.User.findById(id).lean();
+            const userprofile = await Models.User.findById(id).lean();
             if (userprofile) {
                 const response: IResponse = { error: false, message: "User Found", data: userprofile, status: 200, token: null };
                 res.json(response);
@@ -190,13 +190,14 @@ export class DAOManager {
         if (requester) {
             if (recipient) {
                 try {
+                    console.log("hshs");
                     const update1: any = await Models.Friends.findOneAndUpdate({ requester: requesterid, recipient: recipientid, status: "pending" }, { status: "friends" }, { new: true }).lean();
                     const update2: any = await Models.Friends.findOneAndUpdate({ requester: requesterid, recipient: recipientid, status: "requested" }, { status: "friends" }, { new: true }).lean();
                     const resp = {
                         update1,
                         update2,
                     };
-                    const response: IResponse = { error: false, message: "Friend Request sent", data: resp, status: 404, token: null };
+                    const response: IResponse = { error: false, message: "Friends", data: resp, status: 404, token: null };
                     res.json(response);
                 } catch (error) {
                     const response: IResponse = { error: true, message: "An error occured", data: null, status: 500, token: null };
@@ -213,6 +214,102 @@ export class DAOManager {
         }
     }
 
+    public async checkReqStatus(requesterid, recipientid, res) {
+        try {
+            const action = await Models.User.aggregate([
+                [
+                    {
+                        $match: {
+                            _id: new ObjectID(requesterid),
+                        },
+                    }, {
+                        $lookup: {
+                            from: "friends",
+                            as: "friendcoll",
+                            let: {
+                                userid: "$_id",
+                            },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $and: [
+                                                {
+                                                    $eq: [
+                                                        "$$userid", "$requester",
+                                                    ],
+                                                }, {
+                                                    $eq: [
+                                                        "$recipient", new ObjectID(recipientid),
+                                                    ],
+                                                }, {
+                                                    $eq: [
+                                                        "$status", "requested",
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            ]);
+            res.send(action);
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    public async checkRecStatus(requesterid, recipientid, res) {
+        try {
+            const action = await Models.User.aggregate([
+                [
+                    {
+                        $match: {
+                            _id: new ObjectID(recipientid),
+                        },
+                    }, {
+                        $lookup: {
+                            from: "friends",
+                            as: "friendcoll",
+                            let: {
+                                userid: "$_id",
+                            },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $and: [
+                                                {
+                                                    $eq: [
+                                                        "$$userid", "$recipient",
+                                                    ],
+                                                }, {
+                                                    $eq: [
+                                                        "$requester", new ObjectID(requesterid),
+                                                    ],
+                                                }, {
+                                                    $eq: [
+                                                        "$status", "pending",
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            ]);
+            res.send(action);
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+
     public async getPosts(id, res) {
         try {
             const user = await Models.User.findById(id);
@@ -221,7 +318,7 @@ export class DAOManager {
                     {
                         $match: {
                             _id: new ObjectID(id),
-                        }
+                        },
                     }, {
                         $lookup: {
                             from: "posts",

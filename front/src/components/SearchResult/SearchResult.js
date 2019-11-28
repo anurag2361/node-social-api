@@ -6,11 +6,17 @@ class SearchResult extends Component {
         super();
         this.state = {
         };
+        // this.handleClick = this.handleClick.bind(this);
     }
 
     componentDidMount() {
         console.log(this.props.location.payload);
     }
+
+    // handleClick() {
+    //     console.log("this was clicked");
+    //     this.props.history.push("/" + this.props.location.payload.id + "/profile");
+    // }
 
     render() {
         return (
@@ -18,7 +24,7 @@ class SearchResult extends Component {
                 <Header />
                 <div className="container" style={{ marginTop: "10px" }}>
                     <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                        <a className="navbar-brand">{this.props.location.payload.name}</a>
+                        <a href={"/" + this.props.location.payload.id + "/profile"} className="navbar-brand">{this.props.location.payload.name}</a>
                     </nav>
                 </div>
             </div>

@@ -13,6 +13,7 @@ class Header extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.logout = this.logout.bind(this);
         this.home = this.home.bind(this);
+        this.getFriends = this.getFriends.bind(this);
     }
 
     handleChange(event) {
@@ -23,7 +24,6 @@ class Header extends Component {
 
     async deleteredistoken() {
         const a = window.location.href.split("/");
-        console.log(a);
         const token = localStorage.getItem("token");
         const headers = {
             "Authorization": token
@@ -36,15 +36,19 @@ class Header extends Component {
     }
 
     home() {
-        console.log(this.props);
         const a = window.location.href.split("/");
-        window.location = "/" + a[3] + "/profile";
+        window.location = "/" + this.props.selfid + "/profile";
     }
 
     async logout() {
         await this.deleteredistoken();
         localStorage.removeItem("token");
         window.location = "/";
+    }
+
+    async getFriends() {
+        const a = window.location.href.split("/");
+        window.location = "/" + a[3] + "/getfriends";
     }
 
     fetchData() {
@@ -59,7 +63,6 @@ class Header extends Component {
                 searchid: this.state.search
             }
         }).then((response) => {
-            console.log(response.data.data.body.hits.hits[0]._source.profile.name);
             this.setState({
                 name: response.data.data.body.hits.hits[0]._source.profile.name,
                 id: response.data.data.body.hits.hits[0]._source.profile._id
@@ -80,6 +83,7 @@ class Header extends Component {
                 <nav className="navbar navbar-dark bg-dark">
                     <button type="button" onClick={this.logout} className="btn btn-danger">Log Out</button>
                     <button type="button" onClick={this.home} className="btn btn-primary">Home</button>
+                    <button type="button" className="btn btn-info" onClick={this.getFriends} style={{ marginLeft: "10px" }}>Friends</button>
                     <form className="form-inline" onSubmit={this.fetchData()}>
                         <input className="form-control mr-sm-2" value={this.state.search} type="search" name="search" onChange={this.handleChange} placeholder="Search" aria-label="Search" />
                         <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>

@@ -27,12 +27,7 @@ router.post("/login", (req: Request, res: Response) => {
 
 // open profile
 router.get("/:userid/profile", auth, (req: Request, res: Response) => {
-    const request: any = req;
-    if (request.decoded.id) {
-        DAOManager.prototype.profile(request.decoded.id, res);
-    } else if (request.decoded._id) {
-        DAOManager.prototype.profile(request.decoded._id, res);
-    }
+    DAOManager.prototype.profile(req.params.userid, res);
 });
 
 // make a post
@@ -115,6 +110,16 @@ router.get("/:requesterid/request/:recipientid/", auth, (req: Request, res: Resp
 // friend request accept
 router.get("/:requesterid/accept/:recipientid/", auth, (req: Request, res: Response) => {
     DAOManager.prototype.fAccept(req.params.requesterid, req.params.recipientid, res);
+});
+
+// check request status if friend request is sent
+router.get("/:requesterid/sentstatus/:recipientid/", auth, (req: Request, res: Response) => {
+    DAOManager.prototype.checkReqStatus(req.params.requesterid, req.params.recipientid, res);
+});
+
+// check request status if friend request is recieved
+router.get("/:requesterid/recvdstatus/:recipientid/", auth, (req: Request, res: Response) => {
+    DAOManager.prototype.checkRecStatus(req.params.requesterid, req.params.recipientid, res);
 });
 
 // timeline
