@@ -31,9 +31,6 @@ class GetFriends extends Component {
     }
 
     render() {
-        this.state.friends.map((friends, index) => {
-            console.log(friends.recipient);
-        })
         return (
             <div>
                 <Header props={this.props}></Header>

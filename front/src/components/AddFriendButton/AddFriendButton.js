@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import PostSomething from "../PostSomething/PostSomething";
 
 class AddFriendButton extends Component {
     constructor() {
@@ -73,7 +74,7 @@ class AddFriendButton extends Component {
         console.log(this.state.buttonValue);
         if (this.state.buttonValue !== "Accept Request") {
             console.log("hii");
-            const data = await axios.get("/user/" + this.state.requesterid + "/request/" + recipientId, { headers });
+            const data = await axios.get("/user/" + this.props.selfid + "/request/" + recipientId, { headers });
             console.log(data.data);
             if (data.data.message === "Friend Request sent") {
                 this.setState({ requestStatus: true });
@@ -97,6 +98,9 @@ class AddFriendButton extends Component {
                                 return <button disabled={this.state.requestStatus === "requester"} onClick={this.handleClick} type="button" style={{ marginTop: "10px" }} className="btn btn-info">{this.state.buttonValue}</button>;
                             case "recipient":
                                 return <button onClick={this.handleClick} type="button" style={{ marginTop: "10px" }} className="btn btn-info">{this.state.buttonValue}</button>;
+                            default:
+                                return <button disabled={this.state.requestStatus === "requester"} onClick={this.handleClick} type="button" style={{ marginTop: "10px" }} className="btn btn-info">{this.state.buttonValue}</button>;
+
                         }
                     })()
                 }

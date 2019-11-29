@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import axios from "axios";
-import SearchResult from "../SearchResult/SearchResult";
 
 class Header extends Component {
     constructor() {
@@ -14,12 +13,18 @@ class Header extends Component {
         this.logout = this.logout.bind(this);
         this.home = this.home.bind(this);
         this.getFriends = this.getFriends.bind(this);
+        this.handleSearchChange = this.handleSearchChange.bind(this);
+        this.fetchData = this.fetchData.bind(this);
     }
 
     handleChange(event) {
         const state = this.state;
         state[event.target.name] = event.target.value;
         this.setState(state);
+    }
+
+    handleSearchChange(event) {
+        this.setState({ [event.target.name]: event.target.value });
     }
 
     async deleteredistoken() {
@@ -36,7 +41,6 @@ class Header extends Component {
     }
 
     home() {
-        const a = window.location.href.split("/");
         window.location = "/" + this.props.selfid + "/profile";
     }
 
@@ -51,7 +55,10 @@ class Header extends Component {
         window.location = "/" + a[3] + "/getfriends";
     }
 
-    fetchData() {
+    fetchData(event) {
+        event.preventDefault();
+        // eslint-disable-next-line
+        const { search } = this.state;
         const a = window.location.href.split("/");
         axios({
             method: "POST",
@@ -78,14 +85,15 @@ class Header extends Component {
     }
 
     render() {
+        const { search } = this.state;
         return (
             <div>
                 <nav className="navbar navbar-dark bg-dark">
                     <button type="button" onClick={this.logout} className="btn btn-danger">Log Out</button>
                     <button type="button" onClick={this.home} className="btn btn-primary">Home</button>
                     <button type="button" className="btn btn-info" onClick={this.getFriends} style={{ marginLeft: "10px" }}>Friends</button>
-                    <form className="form-inline" onSubmit={this.fetchData()}>
-                        <input className="form-control mr-sm-2" value={this.state.search} type="search" name="search" onChange={this.handleChange} placeholder="Search" aria-label="Search" />
+                    <form className="form-inline" onSubmit={this.fetchData}>
+                        <input className="form-control mr-sm-2" value={search} type="search" name="search" onChange={this.handleSearchChange} placeholder="Search" aria-label="Search" />
                         <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                     </form>
                 </nav>
